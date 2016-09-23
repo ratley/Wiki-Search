@@ -1,7 +1,6 @@
-# Bradley Inniss, DBC
-# Provides short summary of inputted search term(if available)
+# Bradley Inniss, DBC 9/1/2016
+# Provides short description of inputted search term(if available)
 
-require 'rubygems'
 require 'nokogiri'
 require 'open-uri'
 
@@ -13,17 +12,42 @@ module WikiSearch
     string.gsub(/ /, '_')
   end
 
-  def self.link(string)
-    @@wiki + to_underscore(string)
+  # Creates the link using user input
+  # (ex: https://en.wikipedia.org/wiki/dev_bootcamp)
+  def self.get_link
+    puts "What would you like to search on Wikipedia?"
+    link = @@wiki + to_underscore(gets.chomp)
+    link
   end
 
-  def self.parse_page
+  # Parses Wiki page using Nokogiri
+  def self.parse_page(link)
     page = Nokogiri::HTML(open(link))
     @@header = page.css('h1')[0].text
     @@description = page.css("p")[0].text
     page
   end
 
+
+  # Combines the parsing, searching, and displaying methods into one
+  def self.search
+    begin
+      parse_page(get_link)
+      system "clear"
+      display
+      search_again
+
+    rescue OpenURI::HTTPError => error
+        if error.message == '404 Not Found'
+          puts "This page does not exist. Please try again."
+          search
+        else
+          raise error
+        end
+    end
+  end
+
+  # Displays page header and a the first 'p' on the page
   def self.display
     @@header.each_char do |chr|
         print chr
@@ -34,53 +58,25 @@ module WikiSearch
       puts @@description
   end
 
-  def self.error_catch
-
+  # Used to search again after a search has been made
+  def self.search_again
+      puts "\nWould you like to search something else?(y/n)"
+      search_again = gets.chomp
+      until search_again == "y" || search_again == "n"
+        puts "Please enter 'y' or 'n'."
+        search_again = gets.chomp
+      end
+      if search_again == "y"
+        puts "\n"
+        clear_screen & search
+      else
+        exit
+      end
   end
+
+  # Clears screen
+  def self.clear_screen
+    system "clear"
+  end
+  
 end
-
-# p WikiSearch.link("dev bootcamp")  ##### CODE BEGINS HERE
-# Refactor and pseudocode
-# Parses wiki page requested by user
-# def search_wiki
-#   system "clear"
-#   begin
-#   page = Nokogiri::HTML(open("https://en.wikipedia.org/wiki/" + "#{new_str.join}"))
-#   # p page.class
-#   header = page.css("h1")[0].text
-#
-#   # Prints one character at a time on the same line...just to be a little fancy!
-#   header.each_char do |chr|
-#     print chr
-#     sleep(0.1)
-#     STDOUT.flush
-#   end
-#
-#   puts "\n\n"
-#   puts page.css("p")[0].text
-#
-# # Handles 404 error
-#   rescue OpenURI::HTTPError => error
-#     if error.message == '404 Not Found'
-#       puts "This page does not exist. Please try again."
-#       try_again = true
-#       search_wiki
-#     else
-#       raise error
-#     end
-#   end
-#   if try_again == false
-#     puts "\nWould you like to search something else?(y/n)"
-#     search_again = gets.chomp
-#     until search_again == "y" || search_again == "n"
-#       puts "Please enter 'y' or 'n'."
-#       search_again = gets.chomp
-#     end
-#     if search_again == "y"
-#       puts "\n"
-#       search_wiki
-#     end
-#   end
-# end
-
-# search_wiki
