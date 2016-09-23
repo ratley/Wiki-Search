@@ -13,7 +13,7 @@ module WikiSearch
   end
 
   # Creates the link using user input
-  # (ex: https://en.wikipedia.org/wiki/dev_bootcamp)
+  # ex: dev bootcamp => https://en.wikipedia.org/wiki/dev_bootcamp
   def self.get_link
     puts "What would you like to search on Wikipedia?"
     link = @@wiki + to_underscore(gets.chomp)
