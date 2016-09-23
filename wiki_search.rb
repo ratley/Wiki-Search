@@ -7,8 +7,8 @@ require 'open-uri'
 
 module WikiSearch
 
-  def self.user_input
-
+  def self.to_underscore(string)
+    string.gsub(/ /, '_')
   end
 
 end
@@ -67,4 +67,4 @@ def search_wiki
   end
 end
 
-search_wiki
+# search_wiki
